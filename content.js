@@ -74,6 +74,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const count = document.querySelectorAll('.disabled-submit-button').length;
         sendResponse({ count });
     }
+    if (request.action === 'confirmEnable') {
+        const confirmed = confirm('Are you sure you want to reenable submit buttons?');
+        sendResponse({ confirmed });
+    }
     // Return true to indicate async response if needed
     return true;
 });
