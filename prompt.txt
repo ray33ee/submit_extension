@@ -1,0 +1,11 @@
+Make an extension which disables the 'Submit' button on certain webpages. 
+
+Make no assumptions about the structure of the webpage, only reject buttons if they have 'Submit' in their inner text (case sensitive). 
+
+This should be implemented by a) removing the submit button and b) creating a box of the same dimensions in the same place.
+
+This box should be a yellow square that has a message called DISABLED.
+
+Clicking the yellow square should show a message box saying 'Submit button is disabled by extension. Click extension to enable'
+
+The extension should have an icon which can be clicked on, like most modern extensions. This should bring a popup that allows the user to reenable (and hence delete the yellow square and add the button back).

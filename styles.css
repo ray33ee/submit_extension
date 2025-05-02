@@ -1,0 +1,13 @@
+.disabled-submit-button {
+    background-color: yellow;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+} 
