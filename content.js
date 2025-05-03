@@ -69,10 +69,22 @@ function restoreSubmitButtons() {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'restore') {
         restoreSubmitButtons();
+        sendResponse({ restored: true });
     }
     if (request.action === 'getDisabledCount') {
-        const count = document.querySelectorAll('.disabled-submit-button').length;
-        sendResponse({ count });
+        // Only count buttons with text 'Submit'
+        const allSubmitButtons = Array.from(document.querySelectorAll('button')).filter(btn => btn.textContent.includes('Submit'));
+        const total = allSubmitButtons.length;
+        let disabled = 0;
+        let enabled = 0;
+        allSubmitButtons.forEach(btn => {
+            if (btn.style.display === 'none') {
+                disabled++;
+            } else {
+                enabled++;
+            }
+        });
+        sendResponse({ total, disabled, enabled });
     }
     if (request.action === 'confirmEnable') {
         const confirmed = confirm('Are you sure you want to reenable submit buttons?');

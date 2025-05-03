@@ -16,24 +16,26 @@ This browser extension automatically disables submit buttons on webpages by repl
 ### Chrome / Edge
 
 1. Clone or download this repository
-2. Open your browser's extension management page
+2. Rename `manifest-chrome.json` to `manifest.json`
+3. Open your browser's extension management page
    - Chrome: chrome://extensions/
    - Edge: edge://extensions/
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select this directory
+4. Enable "Developer mode"
+5. Click "Load unpacked" and select this directory
 
 ### Firefox
 
 1. Clone or download this repository
-2. Open Firefox
-3. Go to `about:debugging`
-4. Click on "This Firefox" in the left sidebar
-5. Click "Load Temporary Add-on..."
-6. Select the `manifest.json` file in this directory
+2. Rename `manifest-firefox.json` to `manifest.json`
+3. Open Firefox
+4. Go to `about:debugging`
+5. Click on "This Firefox" in the left sidebar
+6. Click "Load Temporary Add-on..."
+7. Select the `manifest.json` file in this directory
 
 **Note:**
 - This will install the extension temporarily. It will be removed when you close Firefox.
-- Eventually this project will be added to the Firefox extension store so this wont be an issue.
+- Eventually this project will be added to the Firefox extension store so this won't be an issue.
 
 ## Usage
 
@@ -44,8 +46,6 @@ This browser extension automatically disables submit buttons on webpages by repl
 
 ## Todo
 
-- Make sure extension works in chrome, safari and opera
-- Make the reenable buttona big warning symbol or something
+- Make the reenable button a big warning symbol or something
 - Clean up popup UI
 - Add extension to extension stores (chrome, firefox, etc.)
-- Make sure user settings in popup menu are saved

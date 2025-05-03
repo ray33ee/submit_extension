@@ -4,30 +4,158 @@
     <title>Submit Button Disabler</title>
     <style>
         body {
-            width: 200px;
-            padding: 10px;
-            font-family: Arial, sans-serif;
+            background: #23272f;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-width: 320px;
+            min-height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: #181a20;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+            padding: 32px 24px 24px 24px;
+            width: 100%;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .checkmark {
+            background: #23272f;
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        }
+        .checkmark svg {
+            width: 36px;
+            height: 36px;
+            color: #4caf50;
+        }
+        .main-title {
+            color: #fff;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+        .status {
+            color: #b0b3b8;
+            font-size: 1em;
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: #2c2f36;
+            margin: 18px 0;
+            border: none;
+        }
+        label {
+            color: #b0b3b8;
+            font-size: 1em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        /* Hide the default checkbox */
+        input[type="checkbox"] {
+            display: none;
+        }
+        /* Custom checkbox */
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            background: #23272f;
+            border: 2px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+        }
+        label:hover .custom-checkbox {
+            border-color: #4caf50;
+        }
+        /* Checkmark (hidden by default) */
+        .custom-checkbox svg {
+            display: none;
+            width: 16px;
+            height: 16px;
+        }
+        input[type="checkbox"]:checked + .custom-checkbox {
+            border-color: #4caf50;
+            background: #26332a;
+        }
+        input[type="checkbox"]:checked + .custom-checkbox svg {
+            display: block;
         }
         button {
             width: 100%;
-            padding: 8px;
-            background-color: #4CAF50;
-            color: white;
+            padding: 12px 0;
+            background-color: #4caf50;
+            color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 500;
             cursor: pointer;
+            margin-bottom: 10px;
+            transition: background 0.2s;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #43a047;
+        }
+        .github-link {
+            display: block;
+            margin-top: 18px;
+            text-align: center;
+            font-size: 13px;
+            color: #7e818a;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .github-link:hover {
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <div id="status" style="margin-top:10px;"></div>
-    <label style="display:block;margin:10px 0;">
-        <input type="checkbox" id="confirmEnable"> Confirm button enabling
-    </label>
-    <button id="enableButton">Enable Submit Buttons</button>
+    <div class="card">
+        <div class="checkmark">
+            <svg id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="10" stroke="#4caf50" stroke-width="2" fill="none"/><path d="M8 12l2.5 2.5L16 9" stroke="#4caf50"/></svg>
+            <svg id="icon-minus" viewBox="0 0 24 24" fill="none" style="display: none;"><circle cx="12" cy="12" r="10" stroke="#888" stroke-width="2" fill="none"/><rect x="7" y="11" width="10" height="2" rx="1" fill="#888"/></svg>
+            <svg id="icon-exclamation" viewBox="0 0 24 24" fill="none" style="display: none;"><circle cx="12" cy="12" r="10" stroke="#ffd600" stroke-width="2" fill="none"/><text x="12" y="17" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" fill="#ffd600" font-weight="bold">!</text></svg>
+        </div>
+        <div class="main-title">Secure page</div>
+        <div class="status" id="status">Total blocked: 8,020</div>
+        <hr class="divider" />
+        <label>
+            <input type="checkbox" id="confirmEnable">
+            <span class="custom-checkbox">
+                <svg viewBox="0 0 20 20" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4 11 8 15 16 6" />
+                </svg>
+            </span>
+            Confirm button enabling
+        </label>
+        <button id="enableButton">Enable Submit Buttons</button>
+        <a href="https://github.com/ray33ee/submit_extension" target="_blank" class="github-link">View on GitHub</a>
+    </div>
     <script src="popup.js"></script>
 </body>
 </html> 
