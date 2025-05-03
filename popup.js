@@ -19,7 +19,7 @@ function updateStatus(total, disabled, enabled) {
         iconCheck.style.display = '';
         mainTitle.textContent = 'Protected';
     } else if (enabled > 0) {
-        status.textContent = 'NO submit buttons disabled';
+        status.textContent = 'There are submit buttons enabled!';
         iconExclamation.style.display = '';
         mainTitle.textContent = 'WARNING';
     }
