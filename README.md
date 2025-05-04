@@ -46,4 +46,7 @@ This browser extension automatically disables submit buttons on webpages by repl
 
 ## Todo
 
+- Maybe add enable/disable for specific websites and domains? 
+   - blocklist/allowlist
+   - Show a special icon when on a blocked website - maybe a blue icon 
 - Add extension to extension stores (chrome, firefox, etc.)
