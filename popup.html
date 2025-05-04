@@ -9,7 +9,6 @@
             padding: 0;
             font-family: 'Segoe UI', Arial, sans-serif;
             min-width: 320px;
-            min-height: 420px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -24,6 +23,71 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+        }
+        /* Toggle Switch Styles */
+        .toggle-container {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #4caf50;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        /* Red circle with cross icon */
+        .icon-off {
+            display: none;
+            width: 36px;
+            height: 36px;
+        }
+        .icon-off circle {
+            fill: none;
+            stroke: #ff4444;
+            stroke-width: 2;
+        }
+        .icon-off line {
+            stroke: #ff4444;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+        /* Hide elements when extension is off */
+        .extension-off .enable-controls {
+            display: none;
         }
         .checkmark {
             background: #23272f;
@@ -139,24 +203,37 @@
 </head>
 <body>
     <div class="card">
+        <div class="toggle-container">
+            <label class="toggle-switch">
+                <input type="checkbox" id="extensionToggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
         <div class="checkmark">
             <svg id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="10" stroke="#4caf50" stroke-width="2" fill="none"/><path d="M8 12l2.5 2.5L16 9" stroke="#4caf50"/></svg>
             <svg id="icon-minus" viewBox="0 0 24 24" fill="none" style="display: none;"><circle cx="12" cy="12" r="10" stroke="#888" stroke-width="2" fill="none"/><rect x="7" y="11" width="10" height="2" rx="1" fill="#888"/></svg>
             <svg id="icon-exclamation" viewBox="0 0 24 24" fill="none" style="display: none;"><circle cx="12" cy="12" r="10" stroke="#ffd600" stroke-width="2" fill="none"/><text x="12" y="17" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" fill="#ffd600" font-weight="bold">!</text></svg>
+            <svg id="icon-off" viewBox="0 0 24 24" fill="none" style="display: none;">
+                <circle cx="12" cy="12" r="10" stroke="#ff4444" stroke-width="2" fill="none"/>
+                <line x1="8" y1="8" x2="16" y2="16" stroke="#ff4444" stroke-width="2" stroke-linecap="round"/>
+                <line x1="16" y1="8" x2="8" y2="16" stroke="#ff4444" stroke-width="2" stroke-linecap="round"/>
+            </svg>
         </div>
         <div class="main-title">Secure page</div>
         <div class="status" id="status">Total blocked: 8,020</div>
         <hr class="divider" />
-        <label>
-            <input type="checkbox" id="confirmEnable">
-            <span class="custom-checkbox">
-                <svg viewBox="0 0 20 20" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="4 11 8 15 16 6" />
-                </svg>
-            </span>
-            Confirm button enabling
-        </label>
-        <button id="enableButton">Enable Submit Buttons</button>
+        <div class="enable-controls">
+            <label>
+                <input type="checkbox" id="confirmEnable">
+                <span class="custom-checkbox">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="4 11 8 15 16 6" />
+                    </svg>
+                </span>
+                Confirm button enabling
+            </label>
+            <button id="enableButton">Enable Submit Buttons</button>
+        </div>
         <a href="https://github.com/ray33ee/submit_extension" target="_blank" class="github-link" aria-label="View on GitHub">
             <svg height="28" width="28" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto;">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M8 0.198242C3.58 0.198242 0 3.77824 0 8.19824C0 11.5782 2.29 14.3282 5.47 15.3282C5.87 15.3982 6.02 15.1582 6.02 14.9482C6.02 14.7582 6.01 14.1982 6.01 13.4982C3.73 13.9982 3.26 12.6982 3.26 12.6982C2.91 11.8482 2.33 11.6282 2.33 11.6282C1.54 11.1082 2.39 11.1182 2.39 11.1182C3.26 11.1882 3.7 12.0182 3.7 12.0182C4.48 13.3382 5.78 12.9582 6.27 12.7482C6.34 12.1682 6.56 11.7782 6.81 11.5682C4.97 11.3582 3.03 10.6782 3.03 7.60824C3.03 6.72824 3.34 6.01824 3.87 5.44824C3.78 5.23824 3.5 4.41824 3.96 3.31824C3.96 3.31824 4.62 3.08824 6.01 3.99824C6.64 3.82824 7.32 3.74824 8 3.74824C8.68 3.74824 9.36 3.82824 9.99 3.99824C11.38 3.08824 12.04 3.31824 12.04 3.31824C12.5 4.41824 12.22 5.23824 12.13 5.44824C12.66 6.01824 12.97 6.72824 12.97 7.60824C12.97 10.6882 11.03 11.3582 9.19 11.5682C9.5 11.8182 9.77 12.3382 9.77 13.0982C9.77 14.1282 9.76 14.7282 9.76 14.9482C9.76 15.1582 9.91 15.4082 10.32 15.3282C13.51 14.3282 15.8 11.5782 15.8 8.19824C15.8 3.77824 12.42 0.198242 8 0.198242Z" fill="#7e818a"/>

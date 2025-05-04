@@ -26,30 +26,49 @@ function isButtonDisabled(button) {
 
 // Function to update the badge
 function updateBadge() {
-    const disabledButtons = document.querySelectorAll('.disabled-submit-button');
-    const count = disabledButtons.length;
-    chrome.runtime.sendMessage({
-        action: 'updateBadge',
-        count: count
+    chrome.storage.local.get(['extensionEnabled'], (result) => {
+        if (result.extensionEnabled === false) {
+            // If extension is disabled, show no badge
+            chrome.runtime.sendMessage({
+                action: 'updateBadge',
+                count: 0
+            });
+            return;
+        }
+        const disabledButtons = document.querySelectorAll('.disabled-submit-button');
+        const count = disabledButtons.length;
+        chrome.runtime.sendMessage({
+            action: 'updateBadge',
+            count: count
+        });
     });
 }
 
 // Function to process submit buttons
 function processSubmitButtons() {
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        if (button.textContent.includes('Submit') && !isButtonDisabled(button)) {
-            const disabledButton = createDisabledButton(button);
-            // Replace the button with the disabled div
-            button.parentNode.insertBefore(disabledButton, button);
-            button.style.display = 'none';
-            
-            // Store original button reference
-            disabledButton.dataset.originalButtonId = Date.now();
-            button.dataset.disabledButtonId = disabledButton.dataset.originalButtonId;
+    chrome.storage.local.get(['extensionEnabled'], (result) => {
+        if (result.extensionEnabled === false) {
+            // If extension is disabled, restore any disabled buttons
+            restoreSubmitButtons();
+            return;
         }
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(button => {
+            if (button.textContent.includes('Submit') && !isButtonDisabled(button)) {
+                const disabledButton = createDisabledButton(button);
+                // Replace the button with the disabled div
+                button.parentNode.insertBefore(disabledButton, button);
+                button.style.display = 'none';
+                
+                // Store original button reference
+                disabledButton.dataset.originalButtonId = Date.now();
+                button.dataset.disabledButtonId = disabledButton.dataset.originalButtonId;
+            }
+        });
+        updateBadge();
+        // Notify popup that processing is complete
+        chrome.runtime.sendMessage({ action: 'buttonsProcessed' });
     });
-    updateBadge();
 }
 
 // Function to restore submit buttons
@@ -70,28 +89,48 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'restore') {
         restoreSubmitButtons();
         sendResponse({ restored: true });
+        // Notify popup that restore is complete
+        chrome.runtime.sendMessage({ action: 'buttonsProcessed' });
     }
     if (request.action === 'getDisabledCount') {
-        // Only count buttons with text 'Submit'
-        const allSubmitButtons = Array.from(document.querySelectorAll('button')).filter(btn => btn.textContent.includes('Submit'));
-        const total = allSubmitButtons.length;
-        let disabled = 0;
-        let enabled = 0;
-        allSubmitButtons.forEach(btn => {
-            if (btn.style.display === 'none') {
-                disabled++;
-            } else {
-                enabled++;
+        chrome.storage.local.get(['extensionEnabled'], (result) => {
+            if (result.extensionEnabled === false) {
+                sendResponse({ total: 0, disabled: 0, enabled: 0 });
+                return;
             }
+            const allSubmitButtons = Array.from(document.querySelectorAll('button')).filter(btn => btn.textContent.includes('Submit'));
+            const total = allSubmitButtons.length;
+            let disabled = 0;
+            let enabled = 0;
+            allSubmitButtons.forEach(btn => {
+                if (btn.style.display === 'none') {
+                    disabled++;
+                } else {
+                    enabled++;
+                }
+            });
+            sendResponse({ total, disabled, enabled });
         });
-        sendResponse({ total, disabled, enabled });
+        return true; // Keep the message channel open for async response
     }
     if (request.action === 'confirmEnable') {
         const confirmed = confirm('Are you sure you want to reenable submit buttons?');
         sendResponse({ confirmed });
     }
-    // Return true to indicate async response if needed
     return true;
+});
+
+// Listen for storage changes
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'local' && changes.extensionEnabled) {
+        if (changes.extensionEnabled.newValue === false) {
+            // If extension is disabled, restore all buttons
+            restoreSubmitButtons();
+        } else {
+            // If extension is enabled, process buttons
+            processSubmitButtons();
+        }
+    }
 });
 
 // Process buttons when the page loads

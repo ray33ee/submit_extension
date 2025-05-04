@@ -46,6 +46,4 @@ This browser extension automatically disables submit buttons on webpages by repl
 
 ## Todo
 
-- Make the reenable button a big warning symbol or something
-- Clean up popup UI
 - Add extension to extension stores (chrome, firefox, etc.)
