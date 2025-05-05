@@ -182,6 +182,89 @@
             color: #fff;
             margin-right: 8px;
         }
+        
+        /* Help button styles */
+        .help-button {
+            background: #2c2f36;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
+            color: #b0b3b8;
+            margin-left: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .help-button:hover {
+            background: #4caf50;
+            color: white;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: #181a20;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+            padding: 24px;
+            width: 90%;
+            max-width: 480px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-title {
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        .modal-body {
+            color: #b0b3b8;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        .pattern-example {
+            background: #23272f;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-family: monospace;
+            border-left: 3px solid #4caf50;
+        }
+        .pattern-description {
+            margin-bottom: 16px;
+        }
     </style>
 </head>
 <body>
@@ -198,6 +281,7 @@
         <div class="list-mode-info">
             <span class="list-mode-label">Current mode:</span>
             <span id="listModeDisplay">Loading...</span>
+            <button class="help-button" id="helpButton" title="URL Pattern Help">?</button>
         </div>
 
         <div class="list-container">
@@ -206,6 +290,55 @@
             </div>
         </div>
     </div>
+    
+    <!-- Help Modal -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">URL Pattern Guide</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>You can use various URL patterns to match websites:</p>
+                
+                <div class="pattern-example">example.com</div>
+                <div class="pattern-description">
+                    Matches example.com and all subdomains (like sub.example.com)
+                </div>
+                
+                <div class="pattern-example">sub.example.com</div>
+                <div class="pattern-description">
+                    Matches only the specific subdomain
+                </div>
+                
+                <div class="pattern-example">example.com/path</div>
+                <div class="pattern-description">
+                    Matches example.com with the specific path
+                </div>
+                
+                <div class="pattern-example">*.example.com</div>
+                <div class="pattern-description">
+                    Matches all subdomains of example.com
+                </div>
+                
+                <div class="pattern-example">example.*</div>
+                <div class="pattern-description">
+                    Matches example with any top-level domain (.com, .org, etc.)
+                </div>
+                
+                <p>Notes:</p>
+                <ul>
+                    <li>Any URL scheme (http://, https://, file://, etc.) will be preserved if provided</li>
+                    <li>If no scheme is provided, http:// will be added by default</li>
+                    <li>Domain names are converted to lowercase, but paths remain case-sensitive</li>
+                    <li>Trailing slashes are ignored (example.com and example.com/ are treated the same)</li>
+                    <li>In allowlist mode, only listed URLs will have submit buttons disabled</li>
+                    <li>In blocklist mode, all URLs except listed ones will have submit buttons disabled</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
     <script src="url-list.js"></script>
 </body>
 </html> 

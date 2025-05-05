@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Button Gallery</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+
+        .description {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            color: #4a5568;
+        }
+
+        .button-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .button-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        /* Various button styles */
+        .btn-default {
+            /* No specific styling */
+        }
+
+        .btn-large {
+            padding: 12px 30px;
+            font-size: 18px;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-wide {
+            width: 200px;
+        }
+
+        .btn-narrow {
+            width: 80px;
+        }
+
+        .btn-tall {
+            height: 60px;
+        }
+
+        .btn-short {
+            height: 20px;
+            line-height: 10px;
+        }
+
+        .btn-rounded {
+            border-radius: 25px;
+        }
+
+        .btn-primary {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background-color: #a0aec0;
+            color: white;
+            border: none;
+        }
+
+        .btn-success {
+            background-color: #48bb78;
+            color: white;
+            border: none;
+        }
+
+        .btn-danger {
+            background-color: #f56565;
+            color: white;
+            border: none;
+        }
+
+        .btn-warning {
+            background-color: #ed8936;
+            color: white;
+            border: none;
+        }
+
+        .btn-info {
+            background-color: #4fd1c5;
+            color: white;
+            border: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #4299e1;
+            color: #4299e1;
+        }
+
+        .btn-3d {
+            background: #4299e1;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 0 #2b6cb0;
+            position: relative;
+            top: 0;
+            transition: top 0.1s, box-shadow 0.1s;
+        }
+
+        .btn-3d:active {
+            top: 4px;
+            box-shadow: 0 0 0 #2b6cb0;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            border: none;
+            cursor: not-allowed;
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            color: black;
+        }
+
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .custom-font {
+            font-family: 'Courier New', monospace;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .lowercase {
+            text-transform: lowercase;
+        }
+
+        .thin-text {
+            font-weight: 300;
+        }
+
+        .bold-text {
+            font-weight: 700;
+        }
+
+        .italic-text {
+            font-style: italic;
+        }
+
+        .btn-shadow {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .letter-spacing {
+            letter-spacing: 3px;
+        }
+
+        /* Image button with text overlay */
+        .btn-image {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjUwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iNTAiIGZpbGw9IiMzMzMiLz48dGV4dCB4PSIxMDAiIHk9IjMwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiNmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiPlN1Ym1pdDwvdGV4dD48L3N2Zz4=');
+            background-size: cover;
+            color: transparent;
+            width: 150px;
+            height: 40px;
+        }
+
+        /* Animation button */
+        .btn-animated {
+            background: #4299e1;
+            color: white;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-animated::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: all 0.6s;
+        }
+
+        .btn-animated:hover::after {
+            left: 100%;
+        }
+
+        /* Right-to-left button */
+        .rtl-text {
+            direction: rtl;
+        }
+
+        /* Growing buttons section */
+        .growing-section {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .growing-title {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 2rem;
+            font-size: 1.5rem;
+        }
+
+        .growing-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .growing-btn {
+            display: block;
+            background: linear-gradient(45deg, #4299e1, #805ad5);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .growing-btn-size-1 {
+            width: 150px;
+            height: 40px;
+            font-size: 14px;
+        }
+
+        .growing-btn-size-2 {
+            width: 200px;
+            height: 50px;
+            font-size: 16px;
+        }
+
+        .growing-btn-size-3 {
+            width: 250px;
+            height: 60px;
+            font-size: 18px;
+        }
+
+        .growing-btn-size-4 {
+            width: 300px;
+            height: 70px;
+            font-size: 20px;
+        }
+
+        .growing-btn-size-5 {
+            width: 350px;
+            height: 80px;
+            font-size: 22px;
+        }
+
+        .growing-btn-size-6 {
+            width: 400px;
+            height: 90px;
+            font-size: 24px;
+        }
+
+        .growing-btn-size-7 {
+            width: 450px;
+            height: 100px;
+            font-size: 26px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Submit Button Gallery</h1>
+    <p class="description">This page contains a diverse collection of buttons all with the text "Submit" for testing purposes.</p>
+
+    <div class="button-container">
+        <!-- Plain button with no styling -->
+        <div class="button-card">
+            <div class="label">Default HTML Button (No CSS)</div>
+            <button>Submit</button>
+        </div>
+
+        <!-- Basic Buttons -->
+        <div class="button-card">
+            <div class="label">Basic Button</div>
+            <button class="btn-default">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Large Button</div>
+            <button class="btn-large">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Small Button</div>
+            <button class="btn-small">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Wide Button</div>
+            <button class="btn-wide">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Narrow Button</div>
+            <button class="btn-narrow">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Tall Button</div>
+            <button class="btn-tall">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Short Button</div>
+            <button class="btn-short">Submit</button>
+        </div>
+
+        <!-- Color Variations -->
+        <div class="button-card">
+            <div class="label">Primary Button</div>
+            <button class="btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Secondary Button</div>
+            <button class="btn-secondary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Success Button</div>
+            <button class="btn-success">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Danger Button</div>
+            <button class="btn-danger">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Warning Button</div>
+            <button class="btn-warning">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Info Button</div>
+            <button class="btn-info">Submit</button>
+        </div>
+
+        <!-- Border Variations -->
+        <div class="button-card">
+            <div class="label">Rounded Button</div>
+            <button class="btn-rounded btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Outline Button</div>
+            <button class="btn-outline">Submit</button>
+        </div>
+
+        <!-- Advanced Styling -->
+        <div class="button-card">
+            <div class="label">3D Button</div>
+            <button class="btn-3d">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Gradient Button</div>
+            <button class="btn-gradient">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Disabled Button</div>
+            <button class="btn-disabled" disabled>Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Glass Morphism Button</div>
+            <button class="btn-glass">Submit</button>
+        </div>
+
+        <!-- Typography Variations -->
+        <div class="button-card">
+            <div class="label">Monospace Font Button</div>
+            <button class="custom-font btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Uppercase Button</div>
+            <button class="uppercase btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Lowercase Button</div>
+            <button class="lowercase btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Thin Text Button</div>
+            <button class="thin-text btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Bold Text Button</div>
+            <button class="bold-text btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Italic Text Button</div>
+            <button class="italic-text btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Letter Spacing Button</div>
+            <button class="letter-spacing btn-primary">Submit</button>
+        </div>
+
+        <!-- Special Variations -->
+        <div class="button-card">
+            <div class="label">Icon Button</div>
+            <button class="btn-icon btn-primary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M15 7H9V1c0-.6-.4-1-1-1S7 .4 7 1v6H1c-.6 0-1 .4-1 1s.4 1 1 1h6v6c0 .6.4 1 1 1s1-.4 1-1V9h6c.6 0 1-.4 1-1s-.4-1-1-1z"/>
+                </svg>
+                Submit
+            </button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Image-based Button</div>
+            <button class="btn-image" aria-label="Submit">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Animated Button</div>
+            <button class="btn-animated">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">RTL Text Button</div>
+            <button class="rtl-text btn-primary">Submit</button>
+        </div>
+
+        <!-- Combination Styles -->
+        <div class="button-card">
+            <div class="label">Large Rounded Primary</div>
+            <button class="btn-large btn-rounded btn-primary">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Small Outline with Shadow</div>
+            <button class="btn-small btn-outline btn-shadow">Submit</button>
+        </div>
+
+        <div class="button-card">
+            <div class="label">Gradient Rounded Button</div>
+            <button class="btn-gradient btn-rounded">Submit</button>
+        </div>
+
+        <!-- Input Submit -->
+        <div class="button-card">
+            <div class="label">Input Submit Element</div>
+            <input type="submit" value="Submit">
+        </div>
+
+        <!-- Text Submit with button tag -->
+        <div class="button-card">
+            <div class="label">Text Only (no border/bg)</div>
+            <button style="background:none; border:none; padding:0; color:blue; text-decoration:underline; cursor:pointer;">Submit</button>
+        </div>
+    </div>
+
+    <!-- Growing Buttons Section -->
+    <div class="growing-section">
+        <h2 class="growing-title">Increasingly Larger Submit Buttons</h2>
+        <div class="growing-buttons">
+            <button class="growing-btn growing-btn-size-1">Submit</button>
+            <button class="growing-btn growing-btn-size-2">Submit</button>
+            <button class="growing-btn growing-btn-size-3">Submit</button>
+            <button class="growing-btn growing-btn-size-4">Submit</button>
+            <button class="growing-btn growing-btn-size-5">Submit</button>
+            <button class="growing-btn growing-btn-size-6">Submit</button>
+            <button class="growing-btn growing-btn-size-7">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        // Add event listeners to all buttons for testing
+        document.querySelectorAll('button, input[type="submit"]').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log('Button clicked:', this.textContent || this.value);
+            });
+        });
+    </script>
+</body>
+</html> 

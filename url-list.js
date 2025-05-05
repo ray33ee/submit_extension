@@ -1,8 +1,54 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Add a flag to track when actions are in progress
+    let actionInProgress = false;
+    
+    // Debounce function to prevent rapid clicks
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+    
     // Back button functionality
     const backButton = document.getElementById('backButton');
     backButton.addEventListener('click', function() {
+        if (actionInProgress) return;
+        
+        actionInProgress = true;
+        backButton.disabled = true;
+        
         window.location.href = 'settings.html';
+        // No need to reset flags as we're navigating away
+    });
+
+    // Help modal functionality
+    const helpButton = document.getElementById('helpButton');
+    const helpModal = document.getElementById('helpModal');
+    const closeModal = document.getElementById('closeModal');
+    
+    helpButton.addEventListener('click', function() {
+        helpModal.style.display = 'flex';
+    });
+    
+    closeModal.addEventListener('click', function() {
+        helpModal.style.display = 'none';
+    });
+    
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target === helpModal) {
+            helpModal.style.display = 'none';
+        }
+    });
+    
+    // Close modal on escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && helpModal.style.display === 'flex') {
+            helpModal.style.display = 'none';
+        }
     });
 
     // URL Management
@@ -16,19 +62,65 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUrlList(result.urlList || []);
     });
 
+    // Function to normalize URL - only converts domain to lowercase
+    function normalizeUrl(url) {
+        url = url.trim();
+        
+        try {
+            // Check if the URL has any scheme
+            const hasScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(url);
+            
+            // Only prepend with a URL scheme if one is not provided
+            if (!hasScheme) {
+                url = 'http://' + url;
+            }
+            
+            // For URLs that can be parsed with URL constructor
+            try {
+                const urlObj = new URL(url);
+                
+                // Convert only the hostname to lowercase
+                urlObj.hostname = urlObj.hostname.toLowerCase();
+                
+                return urlObj.toString();
+            } catch (e) {
+                // If URL parsing fails, return the original with just the scheme added
+                return url;
+            }
+        } catch (e) {
+            // If anything goes wrong, return the original URL with http:// if needed
+            return hasScheme ? url : 'http://' + url;
+        }
+    }
+
     // Add URL
     function addUrl(url) {
         if (!url) return;
         
-        // Normalize URL
-        url = url.trim().toLowerCase();
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-        }
+        // Normalize the URL - only domain to lowercase
+        url = normalizeUrl(url);
 
         chrome.storage.sync.get(['urlList'], function(result) {
             const urls = result.urlList || [];
-            if (!urls.includes(url)) {
+            
+            // Case-insensitive check to avoid duplicates
+            const urlExists = urls.some(existingUrl => {
+                try {
+                    const existingUrlObj = new URL(existingUrl);
+                    const newUrlObj = new URL(url);
+                    
+                    // Compare hostnames case-insensitive, and the rest of the URL case-sensitive
+                    return existingUrlObj.hostname.toLowerCase() === newUrlObj.hostname.toLowerCase() &&
+                           existingUrlObj.pathname === newUrlObj.pathname &&
+                           existingUrlObj.search === newUrlObj.search &&
+                           existingUrlObj.hash === newUrlObj.hash;
+                } catch (e) {
+                    // Fallback to simple equality if URL parsing fails
+                    return existingUrl === url;
+                }
+            });
+            
+            if (!urlExists) {
                 urls.push(url);
                 chrome.storage.sync.set({ urlList: urls }, function() {
                     updateUrlList(urls);
@@ -113,11 +205,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const newUrl = input.value.trim();
         
         if (newUrl) {
-            // Normalize URL
-            let normalizedUrl = newUrl.toLowerCase();
-            if (!normalizedUrl.startsWith('http://') && !normalizedUrl.startsWith('https://')) {
-                normalizedUrl = 'https://' + normalizedUrl;
-            }
+            // Normalize the URL - only domain to lowercase
+            let normalizedUrl = normalizeUrl(newUrl);
             
             // Get the old URL
             const oldUrl = element.getAttribute('data-url');

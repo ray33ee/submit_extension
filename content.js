@@ -1,5 +1,5 @@
 // Function to create disabled button replacement
-function createDisabledButton(originalButton) {
+function createDisabledButton(originalButton, index) {
     const disabledDiv = document.createElement('div');
     
     disabledDiv.className = 'disabled-submit-button';
@@ -7,9 +7,43 @@ function createDisabledButton(originalButton) {
     disabledDiv.style.height = originalButton.offsetHeight + 'px';
     disabledDiv.textContent = 'DISABLED';
     
+    // Ensure text fits properly while preserving yellow background and original size
+    // Note: some styles are already in styles.css but we set critical ones inline to ensure consistency
+    disabledDiv.style.overflow = 'hidden';
+    disabledDiv.style.textAlign = 'center';
+    disabledDiv.style.display = 'flex'; // Override in case display is changed elsewhere
+    disabledDiv.style.alignItems = 'center'; // Ensure vertical centering
+    disabledDiv.style.justifyContent = 'center'; // Ensure horizontal centering
+    
+    // Get the computed style of the original button to match its font
+    const computedStyle = window.getComputedStyle(originalButton);
+    const originalFontSize = computedStyle.fontSize;
+    
+    // Scale down the font size slightly since "DISABLED" is longer than typical button text
+    // Extract the numeric part and unit from the fontSize
+    const fontSizeMatch = originalFontSize.match(/^([\d.]+)(\D+)$/);
+    if (fontSizeMatch) {
+        const numericSize = parseFloat(fontSizeMatch[1]);
+        const unit = fontSizeMatch[2]; // px, em, rem, etc.
+        // Apply a 0.80 scale factor to make sure the text fits
+        const adjustedSize = (numericSize * 0.80).toFixed(2);
+        disabledDiv.style.fontSize = adjustedSize + unit;
+    } else {
+        // Fallback if parsing fails
+        disabledDiv.style.fontSize = originalFontSize;
+    }
+    
+    disabledDiv.style.fontWeight = 'bold';
+    disabledDiv.style.lineHeight = '1';
+    disabledDiv.style.padding = '0'; // Override any padding to ensure text stays centered
+    
     disabledDiv.addEventListener('click', () => {
         alert('Submit button is disabled by extension. Click extension to enable');
     });
+    
+    
+    // Set the ID for the disabled div
+    disabledDiv.dataset.originalButtonId = `submit-btn-${index}`;
     
     return disabledDiv;
 }
@@ -22,6 +56,21 @@ function isButtonDisabled(button) {
     // Look for the associated disabled div in the DOM
     const disabledDiv = document.querySelector(`.disabled-submit-button[data-original-button-id="${button.dataset.disabledButtonId}"]`);
     return disabledDiv !== null;
+}
+
+// Function to check if a button is a submit button
+function isSubmitButton(button) {
+    // Check for button elements that contain "Submit" text
+    if (button.tagName === 'BUTTON' && button.textContent.includes('Submit')) {
+        return true;
+    }
+    
+    // Check for input elements with type="submit"
+    if (button.tagName === 'INPUT' && button.type === 'submit' && button.value === 'Submit') {
+        return true;
+    }
+    
+    return false;
 }
 
 // Function to update the badge
@@ -120,30 +169,29 @@ function processSubmitButtons() {
             // First restore any existing buttons to avoid duplication
             restoreSubmitButtons();
 
-            const buttons = document.querySelectorAll('button');
+            // Get all potential submit elements (buttons and input[type=submit])
+            const potentialSubmitElements = [...document.querySelectorAll('button, input[type=submit]')];
             const submitButtons = [];
             
             // First collect all submit buttons
-            buttons.forEach(button => {
-                if (button.textContent.includes('Submit') && !isButtonDisabled(button)) {
-                    submitButtons.push(button);
+            potentialSubmitElements.forEach(element => {
+                if (isSubmitButton(element) && !isButtonDisabled(element)) {
+                    submitButtons.push(element);
                 }
             });
             
             // Then disable them with sequential IDs
             submitButtons.forEach((button, index) => {
-                const disabledButton = createDisabledButton(button);
                 
-                // Use a simple sequential ID scheme
-                const uniqueId = `submit-btn-${index}`;
+                // Create the disabled button with the ID
+                const disabledButton = createDisabledButton(button, index);
                 
                 // Replace the button with the disabled div
                 button.parentNode.insertBefore(disabledButton, button);
                 button.style.display = 'none';
                 
-                // Store original button reference
-                disabledButton.dataset.originalButtonId = uniqueId;
-                button.dataset.disabledButtonId = uniqueId;
+                // Store ID on the original button
+                button.dataset.disabledButtonId = index;
             });
             
             updateBadge();
@@ -160,7 +208,7 @@ function restoreSubmitButtons() {
     
     // Create a map of ID to button for faster lookup
     const originalButtons = {};
-    document.querySelectorAll('button[data-disabled-button-id]').forEach(btn => {
+    document.querySelectorAll('button[data-disabled-button-id], input[data-disabled-button-id]').forEach(btn => {
         originalButtons[btn.dataset.disabledButtonId] = btn;
     });
     
@@ -180,10 +228,11 @@ function restoreSubmitButtons() {
     });
     
     // Final pass: Find any buttons that might have been missed
-    document.querySelectorAll('button').forEach(btn => {
-        if (btn.textContent.includes('Submit') && btn.style.display === 'none') {
-            btn.style.display = '';
-            btn.removeAttribute('data-disabled-button-id');
+    document.querySelectorAll('button, input[type=submit]').forEach(element => {
+        if ((element.tagName === 'BUTTON' && element.textContent.includes('Submit') && element.style.display === 'none') ||
+            (element.tagName === 'INPUT' && element.type === 'submit' && element.style.display === 'none')) {
+            element.style.display = '';
+            element.removeAttribute('data-disabled-button-id');
         }
     });
     
@@ -225,12 +274,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     return true; // Keep the message channel open
                 }
 
-                const allSubmitButtons = Array.from(document.querySelectorAll('button')).filter(btn => btn.textContent.includes('Submit'));
-                const total = allSubmitButtons.length;
+                const allSubmitElements = Array.from(document.querySelectorAll('button, input[type=submit]')).filter(el => isSubmitButton(el));
+                const total = allSubmitElements.length;
                 let disabled = 0;
                 let enabled = 0;
-                allSubmitButtons.forEach(btn => {
-                    if (btn.style.display === 'none') {
+                allSubmitElements.forEach(el => {
+                    if (el.style.display === 'none') {
                         disabled++;
                     } else {
                         enabled++;
