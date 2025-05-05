@@ -1,15 +1,21 @@
 # Submit Button Disabler Extension
 
-This browser extension automatically disables submit buttons on webpages by replacing them with yellow disabled buttons.
+This browser extension automatically disables submit buttons on webpages by replacing them with disabled buttons, helping to prevent accidental form submissions.
 
 ## Features
 
 - Automatically detects and disables buttons containing the text "Submit"
-- Replaces submit buttons with yellow disabled buttons
-- Clicking the disabled button shows an alert message
-- Extension popup allows re-enabling submit buttons
+- Replaces submit buttons with disabled buttons showing "DISABLED" text
+- Clicking disabled buttons shows an alert message with instructions
+- Modern, clean UI with dark theme
+- Extension popup shows real-time status of buttons on the current page
 - Badge shows the number of disabled submit buttons
-- Optional confirmation before reenabling buttons
+- Toggle to enable/disable the extension instantly
+- URL management with allowlist/blocklist capabilities:
+  - Blocklist mode: Disables buttons on all sites EXCEPT those in your list
+  - Allowlist mode: Disables buttons ONLY on sites in your list
+- Optional confirmation before re-enabling buttons
+- Visual indicators for different states (protected, warning, ignored, etc.)
 
 ## Installation
 
@@ -34,19 +40,41 @@ This browser extension automatically disables submit buttons on webpages by repl
 7. Select the `manifest.json` file in this directory
 
 **Note:**
-- This will install the extension temporarily. It will be removed when you close Firefox.
-- Eventually this project will be added to the Firefox extension store so this won't be an issue.
+- This will install the extension temporarily in Firefox. It will be removed when you close Firefox.
+- Eventually this project will be available in browser extension stores for easier installation.
 
 ## Usage
 
-- The extension automatically disables submit buttons on all webpages
+### Basic Usage
+- The extension automatically disables submit buttons on all webpages (unless configured otherwise)
 - Click the extension icon in your browser toolbar to open the popup
-- Click "Enable Submit Buttons" to restore the original submit buttons
-- Use the checkbox in the popup to require confirmation before reenabling
+- Click "Enable Submit Buttons" to temporarily restore buttons on the current page
+- Use the main toggle at the top-right to quickly turn the extension on/off
 
-## Todo
+### URL Management
+- Click the settings icon in the popup to access settings
+- In URL Management, choose between Blocklist and Allowlist mode
+- Click the "..." button to manage your URL list
+- Add, edit or remove URLs from your list:
+  - Double-click any URL to edit it in-place
+  - Click the pencil icon to edit a URL
+  - Click the X icon to remove a URL
+  - Add new URLs using the input field at the bottom of the list
+- URL patterns support:
+  - Wildcards (e.g., `*.example.com`, `example.com/*`)
+  - Subdomain matching (adding `example.com` will match all subdomains)
+  - Path matching (e.g., `example.com/specific-page`)
 
-- Maybe add enable/disable for specific websites and domains? 
-   - blocklist/allowlist
-   - Show a special icon when on a blocked website - maybe a blue icon 
-- Add extension to extension stores (chrome, firefox, etc.)
+### Status Indicators
+- Green checkmark: All submit buttons are disabled (Protected)
+- Yellow exclamation: Submit buttons are enabled (Warning)
+- Gray dash: No submit buttons on page (Safe)
+- Blue circle with line: Page is ignored due to allowlist/blocklist settings
+- Red cross: Extension has meen turned off by the user
+
+## Future Plans
+
+- Add extension to official extension stores:
+  - Firefox Add-ons
+  - Microsoft Edge Add-ons
+  - Safari Extensions

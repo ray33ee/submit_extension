@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Button Disabler - Settings</title>
+    <style>
+        body {
+            background: #23272f;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-width: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: #181a20;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+            padding: 32px 24px 24px 24px;
+            width: 100%;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+        .back-button {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            margin-right: 16px;
+        }
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .back-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #b0b3b8;
+            transition: fill 0.2s;
+        }
+        .back-button:hover svg {
+            fill: #fff;
+        }
+        .settings-title {
+            color: #fff;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0;
+        }
+        .settings-section {
+            width: 100%;
+            margin-bottom: 24px;
+        }
+        .settings-section-title {
+            color: #b0b3b8;
+            font-size: 1.1em;
+            margin-bottom: 16px;
+        }
+        .settings-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #2c2f36;
+        }
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+        .option-label {
+            color: #fff;
+            font-size: 1em;
+        }
+        .option-description {
+            color: #b0b3b8;
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #4caf50;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        /* Custom checkbox styles */
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            background: #23272f;
+            border: 2px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s, background 0.2s;
+            position: relative;
+        }
+        .custom-checkbox svg {
+            display: none;
+            width: 16px;
+            height: 16px;
+        }
+        input[type="checkbox"]:checked + .custom-checkbox {
+            border-color: #4caf50;
+            background: #26332a;
+        }
+        input[type="checkbox"]:checked + .custom-checkbox svg {
+            display: block;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .checkbox-label:hover .custom-checkbox {
+            border-color: #4caf50;
+        }
+        /* List Management Styles */
+        .list-container {
+            width: 100%;
+            margin-top: 16px;
+        }
+        .list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .list-mode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #b0b3b8;
+            font-size: 0.9em;
+        }
+        .list-mode-toggle .toggle-switch {
+            width: 40px;
+            height: 20px;
+        }
+        .list-mode-toggle .toggle-slider:before {
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+        }
+        .list-mode-toggle input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        .url-input-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .url-input {
+            flex: 1;
+            background: #23272f;
+            border: 1px solid #2c2f36;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 0.9em;
+            transition: border-color 0.2s;
+        }
+        .url-input:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+        .url-input::placeholder {
+            color: #666;
+        }
+        .add-url-button {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        .add-url-button:hover {
+            background: #43a047;
+        }
+        .url-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #2c2f36;
+            border-radius: 6px;
+            background: #23272f;
+        }
+        .url-item, .add-url-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-bottom: 1px solid #2c2f36;
+            transition: background-color 0.2s;
+        }
+        .url-item:last-child {
+            border-bottom: none;
+        }
+        .url-item:hover {
+            background: #2c2f36;
+        }
+        .add-url-item {
+            background: #2a2d36;
+        }
+        .add-url-input {
+            flex: 1;
+            background: #23272f;
+            border: 1px solid #2c2f36;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 0.9em;
+            transition: border-color 0.2s;
+            margin-right: 8px;
+        }
+        .add-url-input:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+        .url-text {
+            color: #fff;
+            font-size: 0.9em;
+            word-break: break-all;
+            margin-right: 12px;
+        }
+        .url-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .edit-url-button, .remove-url-button, .save-url-button, .cancel-edit-button {
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        .edit-url-button:hover, .remove-url-button:hover, .save-url-button:hover, .cancel-edit-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .edit-url-button svg, .remove-url-button svg, .save-url-button svg, .cancel-edit-button svg {
+            width: 16px;
+            height: 16px;
+            fill: #b0b3b8;
+            transition: fill 0.2s;
+        }
+        .edit-url-button:hover svg {
+            fill: #2196F3;
+        }
+        .save-url-button:hover svg {
+            fill: #4caf50;
+        }
+        .remove-url-button:hover svg, .cancel-edit-button:hover svg {
+            fill: #ff4444;
+        }
+        .edit-url-input {
+            background: #2c2f36;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9em;
+            padding: 4px 8px;
+            width: 100%;
+            outline: none;
+        }
+        .empty-list-message {
+            color: #666;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+        .more-button {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .more-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .more-button svg {
+            width: 20px;
+            height: 20px;
+            fill: #b0b3b8;
+            transition: fill 0.2s;
+        }
+        .more-button:hover svg {
+            fill: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <button class="back-button" id="backButton" title="Back">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+            </button>
+            <h1 class="settings-title">Settings</h1>
+        </div>
+        
+        <div class="settings-section">
+            <h2 class="settings-section-title">General</h2>
+            <div class="settings-option">
+                <div>
+                    <div class="option-label">Confirm Button Enabling</div>
+                    <div class="option-description">Require confirmation before enabling submit buttons</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="confirmEnable">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2 class="settings-section-title">URL Management</h2>
+            <div class="settings-option">
+                <div>
+                    <div class="option-label">List Mode</div>
+                    <div class="option-description">Choose between blocking or allowing specific URLs</div>
+                </div>
+                <div class="list-mode-toggle">
+                    <span>Blocklist</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="listModeToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Allowlist</span>
+                </div>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="option-label">URL List</div>
+                    <div class="option-description">Manage URLs in your list</div>
+                </div>
+                <button class="more-button" id="urlListButton" title="Manage URL List">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="settings.js"></script>
+</body>
+</html> 

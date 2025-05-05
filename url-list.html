@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Submit Button Disabler - URL Management</title>
+    <style>
+        body {
+            background: #23272f;
+            width: 400px;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-width: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            background: #181a20;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+            padding: 32px 24px 24px 24px;
+            width: 100%;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 24px;
+        }
+        .back-button {
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            margin-right: 16px;
+        }
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .back-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #b0b3b8;
+            transition: fill 0.2s;
+        }
+        .back-button:hover svg {
+            fill: #fff;
+        }
+        .settings-title {
+            color: #fff;
+            font-size: 1.5em;
+            font-weight: 600;
+            margin: 0;
+        }
+        .sub-title {
+            color: #b0b3b8;
+            font-size: 1em;
+            margin: 8px 0 24px 0;
+            align-self: flex-start;
+        }
+        .list-container {
+            width: 100%;
+            margin-top: 16px;
+        }
+        /* URL List Styles */
+        .url-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #2c2f36;
+            border-radius: 6px;
+            background: #23272f;
+        }
+        .url-item, .add-url-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-bottom: 1px solid #2c2f36;
+            transition: background-color 0.2s;
+        }
+        .url-item:last-child {
+            border-bottom: none;
+        }
+        .url-item:hover {
+            background: #2c2f36;
+        }
+        .add-url-item {
+            background: #2a2d36;
+        }
+        .add-url-input {
+            flex: 1;
+            background: #23272f;
+            border: 1px solid #2c2f36;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #fff;
+            font-size: 0.9em;
+            transition: border-color 0.2s;
+            margin-right: 8px;
+        }
+        .add-url-input:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+        .url-text {
+            color: #fff;
+            font-size: 0.9em;
+            word-break: break-all;
+            margin-right: 12px;
+        }
+        .url-actions {
+            display: flex;
+            gap: 4px;
+        }
+        .edit-url-button, .remove-url-button, .save-url-button, .cancel-edit-button {
+            background: none;
+            border: none;
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        .edit-url-button:hover, .remove-url-button:hover, .save-url-button:hover, .cancel-edit-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .edit-url-button svg, .remove-url-button svg, .save-url-button svg, .cancel-edit-button svg {
+            width: 16px;
+            height: 16px;
+            fill: #b0b3b8;
+            transition: fill 0.2s;
+        }
+        .edit-url-button:hover svg {
+            fill: #2196F3;
+        }
+        .save-url-button:hover svg {
+            fill: #4caf50;
+        }
+        .remove-url-button:hover svg, .cancel-edit-button:hover svg {
+            fill: #ff4444;
+        }
+        .edit-url-input {
+            background: #2c2f36;
+            border: 1px solid #4caf50;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.9em;
+            padding: 4px 8px;
+            width: 100%;
+            outline: none;
+        }
+        .empty-list-message {
+            color: #666;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+        .list-mode-info {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            margin-bottom: 16px;
+            color: #b0b3b8;
+            font-size: 0.9em;
+            border-bottom: 1px solid #2c2f36;
+            width: 100%;
+        }
+        .list-mode-label {
+            font-weight: bold;
+            color: #fff;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <button class="back-button" id="backButton" title="Back to Settings">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+            </button>
+            <h1 class="settings-title">URL Management</h1>
+        </div>
+        
+        <div class="list-mode-info">
+            <span class="list-mode-label">Current mode:</span>
+            <span id="listModeDisplay">Loading...</span>
+        </div>
+
+        <div class="list-container">
+            <div class="url-list" id="urlList">
+                <div class="empty-list-message">No URLs added yet</div>
+            </div>
+        </div>
+    </div>
+    <script src="url-list.js"></script>
+</body>
+</html> 

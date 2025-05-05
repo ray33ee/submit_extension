@@ -3,12 +3,14 @@ function updateStatusIcon(iconType) {
     const iconMinus = document.getElementById('icon-minus');
     const iconExclamation = document.getElementById('icon-exclamation');
     const iconOff = document.getElementById('icon-off');
+    const iconIgnored = document.getElementById('icon-ignored');
 
     // Hide all icons first
     iconCheck.style.display = 'none';
     iconMinus.style.display = 'none';
     iconExclamation.style.display = 'none';
     iconOff.style.display = 'none';
+    iconIgnored.style.display = 'none';
 
     // Show the requested icon
     switch(iconType) {
@@ -24,16 +26,23 @@ function updateStatusIcon(iconType) {
         case 'off':
             iconOff.style.display = '';
             break;
+        case 'ignored':
+            iconIgnored.style.display = '';
+            break;
     }
 }
 
-function updateStatus(total, disabled, enabled) {
+function updateStatus(total, disabled, enabled, ignored, listMode) {
     if (!extensionToggle.checked) return;
 
     const status = document.getElementById('status');
     const mainTitle = document.querySelector('.main-title');
 
-    if (total === 0) {
+    if (ignored) {
+        status.textContent = `Page not processed (${listMode === 'allowlist' ? 'not in allowlist' : 'in blocklist'})`;
+        mainTitle.textContent = 'Blocked';
+        updateStatusIcon('ignored');
+    } else if (total === 0) {
         status.textContent = 'No submit buttons in page';
         mainTitle.textContent = 'Safe';
         updateStatusIcon('minus');
@@ -52,55 +61,13 @@ function requestCountAndUpdate() {
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         chrome.tabs.sendMessage(tabs[0].id, {action: 'getDisabledCount'}, (response) => {
             if (response && typeof response.total === 'number' && typeof response.disabled === 'number' && typeof response.enabled === 'number') {
-                updateStatus(response.total, response.disabled, response.enabled);
+                updateStatus(response.total, response.disabled, response.enabled, response.ignored, response.listMode);
             } else {
                 updateStatus(0, 0, 0);
             }
         });
     });
 }
-
-const confirmCheckbox = document.getElementById('confirmEnable');
-
-// Restore checkbox state on popup open
-chrome.storage.local.get(['confirmEnable'], (result) => {
-    confirmCheckbox.checked = !!result.confirmEnable;
-});
-
-// Save checkbox state when changed
-confirmCheckbox.addEventListener('change', () => {
-    chrome.storage.local.set({ confirmEnable: confirmCheckbox.checked });
-});
-
-document.getElementById('enableButton').addEventListener('click', () => {
-    const confirmChecked = confirmCheckbox.checked;
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        const tabId = tabs[0].id;
-        if (confirmChecked) {
-            chrome.tabs.sendMessage(tabId, {action: 'confirmEnable'}, (response) => {
-                if (response && response.confirmed) {
-                    chrome.tabs.sendMessage(tabId, {action: 'restore'}, (restoreResponse) => {
-                        if (restoreResponse && restoreResponse.restored) {
-                            // Wait for the content script to finish restoring buttons
-                            setTimeout(() => {
-                                requestCountAndUpdate();
-                            }, 100);
-                        }
-                    });
-                }
-            });
-        } else {
-            chrome.tabs.sendMessage(tabId, {action: 'restore'}, (restoreResponse) => {
-                if (restoreResponse && restoreResponse.restored) {
-                    // Wait for the content script to finish restoring buttons
-                    setTimeout(() => {
-                        requestCountAndUpdate();
-                    }, 100);
-                }
-            });
-        }
-    });
-});
 
 // Handle extension toggle
 const extensionToggle = document.getElementById('extensionToggle');
@@ -144,4 +111,42 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 });
 
 // Update status when popup opens
-requestCountAndUpdate(); 
+requestCountAndUpdate();
+
+// Settings button click handler
+document.getElementById('settingsButton').addEventListener('click', function() {
+    window.location.href = 'settings.html';
+});
+
+document.getElementById('enableButton').addEventListener('click', () => {
+    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        const tabId = tabs[0].id;
+        // Check the confirm setting from sync storage
+        chrome.storage.sync.get(['confirmEnable'], (result) => {
+            const needsConfirmation = result.confirmEnable;
+            if (needsConfirmation) {
+                chrome.tabs.sendMessage(tabId, {action: 'confirmEnable'}, (response) => {
+                    if (response && response.confirmed) {
+                        chrome.tabs.sendMessage(tabId, {action: 'restore'}, (restoreResponse) => {
+                            if (restoreResponse && restoreResponse.restored) {
+                                // Wait for the content script to finish restoring buttons
+                                setTimeout(() => {
+                                    requestCountAndUpdate();
+                                }, 100);
+                            }
+                        });
+                    }
+                });
+            } else {
+                chrome.tabs.sendMessage(tabId, {action: 'restore'}, (restoreResponse) => {
+                    if (restoreResponse && restoreResponse.restored) {
+                        // Wait for the content script to finish restoring buttons
+                        setTimeout(() => {
+                            requestCountAndUpdate();
+                        }, 100);
+                    }
+                });
+            }
+        });
+    });
+}); 
