@@ -71,10 +71,14 @@
         }
         .settings-option {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #2c2f36;
+        }
+        .settings-option > div {
+            padding-right: 10px;
+            max-width: 70%;
         }
         .settings-option:last-child {
             border-bottom: none;
@@ -348,6 +352,93 @@
         .more-button:hover svg {
             fill: #fff;
         }
+        .list-mode-selector {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            color: #b0b3b8;
+            transition: color 0.2s;
+        }
+        .radio-label:hover {
+            color: #fff;
+        }
+        .radio-label input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .radio-custom {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+        .radio-label:hover .radio-custom {
+            border-color: #4caf50;
+        }
+        .radio-text {
+            color: inherit;
+            font-size: 0.9em;
+        }
+        .radio-label input:checked + .radio-custom {
+            border-color: #4caf50;
+        }
+        .radio-label input:checked + .radio-custom:after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #4caf50;
+            position: absolute;
+        }
+
+        /* Tab Control Styles */
+        .tab-control {
+            display: flex;
+            width: 140px;
+            height: 30px;
+            overflow: hidden;
+            border-radius: 0;
+        }
+        .tab-option {
+            flex: 1;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            border: none;
+            text-align: center;
+            cursor: pointer;
+            color: #b0b3b8;
+            font-size: 0.9em;
+            background: #333;
+            transition: background-color 0.2s;
+        }
+        .tab-option:first-child {
+            border-top-left-radius: 4px;
+            border-bottom-left-radius: 4px;
+        }
+        .tab-option:last-child {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+        .tab-option.active {
+            color: white;
+            background-color: #4caf50;
+        }
+        /* No dividers or borders between buttons */
     </style>
 </head>
 <body>
@@ -380,15 +471,11 @@
             <div class="settings-option">
                 <div>
                     <div class="option-label">List Mode</div>
-                    <div class="option-description">Choose between blocking or allowing specific URLs</div>
+                    <div class="option-description">Choose either a blocklist or allowlist as a way to filter websites</div>
                 </div>
-                <div class="list-mode-toggle">
-                    <span>Blocklist</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="listModeToggle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span>Allowlist</span>
+                <div class="tab-control" id="listModeControl">
+                    <button class="tab-option active" id="blocklistTab" data-mode="blocklist">Block</button>
+                    <button class="tab-option" id="allowlistTab" data-mode="allowlist">Allow</button>
                 </div>
             </div>
             <div class="settings-option">

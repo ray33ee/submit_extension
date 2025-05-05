@@ -55,11 +55,7 @@ This browser extension automatically disables submit buttons on webpages by repl
 - Click the settings icon in the popup to access settings
 - In URL Management, choose between Blocklist and Allowlist mode
 - Click the "..." button to manage your URL list
-- Add, edit or remove URLs from your list:
-  - Double-click any URL to edit it in-place
-  - Click the pencil icon to edit a URL
-  - Click the X icon to remove a URL
-  - Add new URLs using the input field at the bottom of the list
+- Add, edit or remove URLs from your list
 - URL patterns support:
   - Wildcards (e.g., `*.example.com`, `example.com/*`)
   - Subdomain matching (adding `example.com` will match all subdomains)
@@ -75,6 +71,5 @@ This browser extension automatically disables submit buttons on webpages by repl
 ## Future Plans
 
 - Add extension to official extension stores:
-  - Firefox Add-ons
   - Microsoft Edge Add-ons
   - Safari Extensions

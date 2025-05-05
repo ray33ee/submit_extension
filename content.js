@@ -37,10 +37,127 @@ function createDisabledButton(originalButton, index) {
     disabledDiv.style.lineHeight = '1';
     disabledDiv.style.padding = '0'; // Override any padding to ensure text stays centered
     
-    disabledDiv.addEventListener('click', () => {
-        alert('Submit button is disabled by extension. Click extension to enable');
+    // Create balloon tooltip function
+    disabledDiv.addEventListener('click', (e) => {
+        // Remove any existing tooltips first
+        const existingTooltips = document.querySelectorAll('.submit-disabled-tooltip');
+        existingTooltips.forEach(tooltip => removeTooltip(tooltip));
+        
+        // Create tooltip element
+        const tooltip = document.createElement('div');
+        tooltip.className = 'submit-disabled-tooltip';
+        tooltip.textContent = 'This button is disabled by the Submit Button Disabler extension. Click the extension icon to enable or find more information on the extension.';
+        
+        // Position the tooltip near the click
+        const buttonRect = disabledDiv.getBoundingClientRect();
+        const tooltipWidth = 250; // Match the maxWidth we'll set below
+        
+        // Calculate position to center the tooltip above the button
+        const leftPosition = buttonRect.left + (buttonRect.width / 2) - (tooltipWidth / 2);
+        // Make sure the tooltip stays within the viewport
+        const adjustedLeft = Math.max(10, Math.min(leftPosition, window.innerWidth - tooltipWidth - 10));
+        
+        // Add tooltip to DOM first so we can measure its height
+        document.body.appendChild(tooltip);
+        
+        // Style the tooltip
+        Object.assign(tooltip.style, {
+            position: 'fixed',
+            left: `${adjustedLeft}px`,
+            backgroundColor: '#333',
+            color: 'white',
+            padding: '8px 12px',
+            borderRadius: '6px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+            zIndex: '9999',
+            width: 'auto',
+            maxWidth: `${tooltipWidth}px`,
+            fontSize: '14px',
+            textAlign: 'center',
+            opacity: '0', // Start transparent for animation
+            pointerEvents: 'none' // Allows clicking through the tooltip
+        });
+        
+        // Get tooltip height after styling and position it so the bottom of tooltip aligns with top of button
+        const tooltipHeight = tooltip.offsetHeight;
+        tooltip.style.top = `${buttonRect.top + window.scrollY - tooltipHeight - 10}px`; // 10px for the arrow
+        
+        // Add animation class after position is set
+        requestAnimationFrame(() => {
+            tooltip.style.opacity = '1';
+            tooltip.style.transition = 'opacity 0.3s, transform 0.3s';
+            tooltip.style.transform = 'translateY(0)';
+        });
+        
+        // Calculate arrow position to point at the center of the button
+        const arrowOffset = ((buttonRect.left + buttonRect.width / 2) - adjustedLeft) / tooltipWidth * 100;
+        // Keep the arrow within reasonable bounds (5% to 95% of the tooltip width)
+        const boundedArrowOffset = Math.min(Math.max(arrowOffset, 5), 95);
+        
+        // Add animation CSS if it doesn't exist
+        if (!document.getElementById('submit-disabled-tooltip-style')) {
+            const style = document.createElement('style');
+            style.id = 'submit-disabled-tooltip-style';
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .submit-disabled-tooltip {
+                    animation: fadeIn 0.3s;
+                    position: relative;
+                }
+                .submit-disabled-tooltip:after {
+                    content: '';
+                    position: absolute;
+                    bottom: -10px;
+                    left: var(--arrow-left-pos, 50%);
+                    margin-left: -5px;
+                    border-width: 5px;
+                    border-style: solid;
+                    border-color: #333 transparent transparent transparent;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Set the arrow position to point at the button
+        tooltip.style.setProperty('--arrow-left-pos', `${boundedArrowOffset}%`);
+        
+        // Function to remove the tooltip with animation
+        function removeTooltip(tooltipElement) {
+            if (!tooltipElement) return;
+            tooltipElement.style.opacity = '0';
+            tooltipElement.style.transform = 'translateY(10px)';
+            tooltipElement.style.transition = 'opacity 0.3s, transform 0.3s';
+            setTimeout(() => tooltipElement.remove(), 300);
+        }
+        
+        // Event listener to close tooltip when clicking elsewhere
+        function documentClickHandler(event) {
+            // Don't close if clicking on the disabled button
+            if (event.target === disabledDiv) return;
+            
+            // Remove the tooltip and clean up the event listener
+            removeTooltip(tooltip);
+            document.removeEventListener('click', documentClickHandler);
+        }
+        
+        // Add click event listener to close when clicking elsewhere
+        // Use setTimeout to avoid the current click event from triggering it immediately
+        setTimeout(() => {
+            document.addEventListener('click', documentClickHandler);
+        }, 0);
+        
+        // Auto-remove tooltip after a delay
+        const timeoutId = setTimeout(() => {
+            removeTooltip(tooltip);
+            document.removeEventListener('click', documentClickHandler);
+        }, 7000);
+        
+        // Store the timeout ID on the tooltip so we can cancel it if needed
+        tooltip.dataset.timeoutId = timeoutId;
     });
-    
     
     // Set the ID for the disabled div
     disabledDiv.dataset.originalButtonId = `submit-btn-${index}`;

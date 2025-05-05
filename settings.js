@@ -7,7 +7,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Load saved settings
     chrome.storage.sync.get(['listMode', 'confirmEnable'], function(result) {
-        document.getElementById('listModeToggle').checked = result.listMode === 'allowlist';
+        // Set the appropriate tab based on listMode
+        const listMode = result.listMode || 'blocklist';
+        setActiveTab(listMode);
+        
         document.getElementById('confirmEnable').checked = result.confirmEnable ?? true;
     });
 
@@ -17,13 +20,33 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // URL Management
-    const listModeToggle = document.getElementById('listModeToggle');
+    const listModeControl = document.getElementById('listModeControl');
+    const blocklistTab = document.getElementById('blocklistTab');
+    const allowlistTab = document.getElementById('allowlistTab');
     const urlListButton = document.getElementById('urlListButton');
 
-    // Save list mode when changed
-    listModeToggle.addEventListener('change', function(e) {
-        const mode = e.target.checked ? 'allowlist' : 'blocklist';
-        chrome.storage.sync.set({ listMode: mode });
+    // Function to set the active tab
+    function setActiveTab(mode) {
+        // Remove active class from all tabs
+        blocklistTab.classList.remove('active');
+        allowlistTab.classList.remove('active');
+        
+        // Add active class to the selected tab
+        if (mode === 'allowlist') {
+            allowlistTab.classList.add('active');
+        } else {
+            blocklistTab.classList.add('active');
+        }
+    }
+
+    // Tab click handler
+    listModeControl.addEventListener('click', function(e) {
+        const target = e.target;
+        if (target.classList.contains('tab-option')) {
+            const mode = target.dataset.mode;
+            setActiveTab(mode);
+            chrome.storage.sync.set({ listMode: mode });
+        }
     });
 
     // URL List button click handler
