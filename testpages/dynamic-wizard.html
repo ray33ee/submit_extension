@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Wizard with Submit Buttons</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .wizard-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: #4299e1;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .wizard-step {
+            display: none;
+        }
+
+        .wizard-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-title {
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #4299e1;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            gap: 10px;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-next {
+            background: #805ad5;
+            color: white;
+            border: none;
+            margin-left: auto;
+        }
+
+        .btn-submit {
+            background: #4299e1;
+            color: white;
+            border: none;
+        }
+
+        .btn-prev {
+            background: white;
+            color: #4299e1;
+            border: 2px solid #4299e1;
+        }
+
+        .btn-next:hover {
+            background: #6b46c1;
+        }
+
+        .btn-submit:hover {
+            background: #3182ce;
+        }
+
+        .btn-prev:hover {
+            background: #ebf4ff;
+        }
+
+        .final-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 2rem;
+        }
+
+        .final-submit {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Different styles for final buttons */
+        .final-submit-1 { background: #4299e1; }
+        .final-submit-2 { background: #48bb78; }
+        .final-submit-3 { background: #ed8936; }
+        .final-submit-4 { background: #9f7aea; }
+        .final-submit-5 { background: #f56565; }
+        .final-submit-6 { background: #38b2ac; }
+        
+        .submit-log {
+            background: #edf2f7;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .log-entry:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="wizard-container">
+        <h1>Dynamic Submit Button Wizard</h1>
+        <div class="progress-bar">
+            <div class="progress" id="progressBar"></div>
+        </div>
+        
+        <div class="wizard-steps" id="wizardSteps">
+            <!-- Step 1: Personal Information -->
+            <div class="wizard-step active" data-step="1">
+                <h2 class="step-title">Step 1: Personal Information</h2>
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email address">
+                </div>
+                <div class="button-container" id="step1Buttons">
+                    <!-- Submit button and Next button will be dynamically added here -->
+                </div>
+            </div>
+            
+            <!-- Step 2: Contact Details -->
+            <div class="wizard-step" data-step="2">
+                <h2 class="step-title">Step 2: Contact Details</h2>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" placeholder="Enter your address"></textarea>
+                </div>
+                <div class="button-container" id="step2Buttons">
+                    <button class="btn-prev" id="prevStep2">Previous</button>
+                    <!-- Submit button and Next button will be dynamically added here -->
+                </div>
+            </div>
+            
+            <!-- Step 3: Preferences -->
+            <div class="wizard-step" data-step="3">
+                <h2 class="step-title">Step 3: Preferences</h2>
+                <div class="form-group">
+                    <label for="color">Favorite Color</label>
+                    <select id="color">
+                        <option value="">Select a color</option>
+                        <option value="red">Red</option>
+                        <option value="blue">Blue</option>
+                        <option value="green">Green</option>
+                        <option value="yellow">Yellow</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">Additional Comments</label>
+                    <textarea id="message" placeholder="Enter any additional comments"></textarea>
+                </div>
+                <div class="button-container" id="step3Buttons">
+                    <button class="btn-prev" id="prevStep3">Previous</button>
+                    <!-- Submit button and Next button will be dynamically added here -->
+                </div>
+            </div>
+            
+            <!-- Step 4: Final Step with Multiple Submit Buttons -->
+            <div class="wizard-step" data-step="4">
+                <h2 class="step-title">Step 4: Submission Options</h2>
+                <p>Please choose one of the submission options below:</p>
+                
+                <div class="button-container">
+                    <button class="btn-prev" id="prevStep4">Previous</button>
+                </div>
+                
+                <div class="final-buttons" id="finalButtons">
+                    <!-- Multiple submit buttons will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="submit-log" id="submitLog">
+        <div class="log-entry">Click submit buttons to see events logged here...</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wizardSteps = document.querySelectorAll('.wizard-step');
+            const progressBar = document.getElementById('progressBar');
+            const submitLog = document.getElementById('submitLog');
+            const totalSteps = wizardSteps.length;
+            let currentStep = 1;
+            
+            // Update progress bar
+            function updateProgress() {
+                const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+            
+            // Show a specific step
+            function showStep(step) {
+                wizardSteps.forEach(stepElement => {
+                    stepElement.classList.remove('active');
+                });
+                
+                const stepToShow = document.querySelector(`.wizard-step[data-step="${step}"]`);
+                if (stepToShow) {
+                    stepToShow.classList.add('active');
+                    currentStep = step;
+                    updateProgress();
+                }
+            }
+            
+            // Log submit button clicks
+            function logSubmit(buttonId, step) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.className = 'log-entry';
+                logEntry.textContent = `[${timestamp}] Submit button "${buttonId}" from Step ${step} was clicked`;
+                submitLog.prepend(logEntry);
+            }
+            
+            // Create a dynamic submit button
+            function createSubmitButton(containerId, step, color = null) {
+                const buttonId = `submitBtn_${Math.random().toString(36).substr(2, 9)}`;
+                const container = document.getElementById(containerId);
+                
+                // Create button element
+                const submitButton = document.createElement('button');
+                submitButton.type = 'button';
+                submitButton.id = buttonId;
+                submitButton.className = color ? `final-submit final-submit-${color}` : 'btn-submit';
+                submitButton.textContent = 'Submit';
+                
+                // Add click event listener
+                submitButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    logSubmit(buttonId, step);
+                });
+                
+                // Add to container
+                container.appendChild(submitButton);
+                
+                return buttonId;
+            }
+            
+            // Create a next button
+            function createNextButton(containerId, nextStep) {
+                const container = document.getElementById(containerId);
+                
+                // Create button element
+                const nextButton = document.createElement('button');
+                nextButton.type = 'button';
+                nextButton.className = 'btn-next';
+                nextButton.textContent = 'Next';
+                
+                // Add click event listener
+                nextButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    showStep(nextStep);
+                });
+                
+                // Add to container
+                container.appendChild(nextButton);
+            }
+            
+            // Initialize step 1 (add submit and next buttons)
+            createSubmitButton('step1Buttons', 1);
+            createNextButton('step1Buttons', 2);
+            
+            // Set up previous button handlers
+            document.getElementById('prevStep2').addEventListener('click', () => showStep(1));
+            document.getElementById('prevStep3').addEventListener('click', () => showStep(2));
+            document.getElementById('prevStep4').addEventListener('click', () => showStep(3));
+            
+            // Initialize progress bar
+            updateProgress();
+            
+            // When reaching step 2, create its submit button
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        const step = parseInt(mutation.target.dataset.step);
+                        
+                        // If this step is now active and needs a submit button
+                        if (mutation.target.classList.contains('active')) {
+                            if (step === 2) {
+                                // Create step 2 submit button if it doesn't exist
+                                const container = document.getElementById('step2Buttons');
+                                if (!container.querySelector('.btn-submit')) {
+                                    createSubmitButton('step2Buttons', 2);
+                                    createNextButton('step2Buttons', 3);
+                                }
+                            } 
+                            else if (step === 3) {
+                                // Create step 3 submit button if it doesn't exist
+                                const container = document.getElementById('step3Buttons');
+                                if (!container.querySelector('.btn-submit')) {
+                                    createSubmitButton('step3Buttons', 3);
+                                    createNextButton('step3Buttons', 4);
+                                }
+                            }
+                            else if (step === 4) {
+                                // Create multiple submit buttons for the final step
+                                const container = document.getElementById('finalButtons');
+                                if (container.children.length === 0) {
+                                    // Create different styled submit buttons, all with text "Submit"
+                                    for (let i = 1; i <= 6; i++) {
+                                        createSubmitButton('finalButtons', 4, i);
+                                    }
+                                    
+                                    // Create additional standard submit buttons
+                                    for (let i = 1; i <= 6; i++) {
+                                        createSubmitButton('finalButtons', 4);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+            
+            // Observe all wizard steps for class changes
+            wizardSteps.forEach(step => {
+                observer.observe(step, { attributes: true });
+            });
+        });
+    </script>
+</body>
+</html> 

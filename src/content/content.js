@@ -1,5 +1,5 @@
 // Function to create disabled button replacement
-function createDisabledButton(originalButton, index) {
+function createDisabledButton(originalButton, buttonId) {
     const disabledDiv = document.createElement('div');
     
     disabledDiv.className = 'disabled-submit-button';
@@ -160,19 +160,56 @@ function createDisabledButton(originalButton, index) {
     });
     
     // Set the ID for the disabled div
-    disabledDiv.dataset.originalButtonId = `submit-btn-${index}`;
+    disabledDiv.dataset.originalButtonId = buttonId;
     
     return disabledDiv;
 }
 
-// Function to check if a button is already disabled
-function isButtonDisabled(button) {
-    // Check if the button has a disabled button ID
-    if (!button.dataset.disabledButtonId) return false;
+// Create a storage object to remember buttons we've processed
+const processedButtons = new Map();
+// Counter for truly sequential IDs
+let buttonIdCounter = 0;
+
+// Function to generate a true sequential ID
+function generateButtonId(button) {
+    // If the button already has our ID, return it
+    if (button.dataset.ourButtonId) {
+        return button.dataset.ourButtonId;
+    }
     
-    // Look for the associated disabled div in the DOM
-    const disabledDiv = document.querySelector(`.disabled-submit-button[data-original-button-id="${button.dataset.disabledButtonId}"]`);
-    return disabledDiv !== null;
+    // Generate a new sequential ID using a counter
+    const newId = `submit-btn-${buttonIdCounter++}`;
+    
+    // Store it on the button for future reference
+    button.dataset.ourButtonId = newId;
+    
+    return newId;
+}
+
+// Helper function to get a simplified DOM path for a button
+// Not used with sequential IDs, but keeping in case we need to switch back
+function getButtonPath(element) {
+    return '';
+}
+
+// Modified version of isButtonDisabled that uses our tracking
+function isButtonDisabled(button) {
+    // Generate a unique ID for this button
+    const buttonId = generateButtonId(button);
+    
+    // Check if we've processed this button
+    if (processedButtons.has(buttonId)) {
+        return true;
+    }
+    
+    // Legacy check - look if it has a data attribute
+    if (button.dataset.disabledButtonId) {
+        // Remember this button for future checks
+        processedButtons.set(buttonId, button.dataset.disabledButtonId);
+        return true;
+    }
+    
+    return false;
 }
 
 // Function to check if a button is a submit button
@@ -260,7 +297,7 @@ function isUrlInList(urlList, currentUrl) {
     });
 }
 
-// Function to process submit buttons
+// Modified version of processSubmitButtons that uses our tracking
 function processSubmitButtons() {
     chrome.storage.local.get(['extensionEnabled'], (result) => {
         if (result.extensionEnabled === false) {
@@ -283,14 +320,11 @@ function processSubmitButtons() {
                 return;
             }
 
-            // First restore any existing buttons to avoid duplication
-            restoreSubmitButtons();
-
             // Get all potential submit elements (buttons and input[type=submit])
             const potentialSubmitElements = [...document.querySelectorAll('button, input[type=submit]')];
             const submitButtons = [];
             
-            // First collect all submit buttons
+            // First collect all submit buttons that aren't already disabled
             potentialSubmitElements.forEach(element => {
                 if (isSubmitButton(element) && !isButtonDisabled(element)) {
                     submitButtons.push(element);
@@ -299,16 +333,20 @@ function processSubmitButtons() {
             
             // Then disable them with sequential IDs
             submitButtons.forEach((button, index) => {
+                const buttonId = generateButtonId(button);
                 
                 // Create the disabled button with the ID
-                const disabledButton = createDisabledButton(button, index);
+                const disabledButton = createDisabledButton(button, buttonId);
                 
                 // Replace the button with the disabled div
                 button.parentNode.insertBefore(disabledButton, button);
                 button.style.display = 'none';
                 
                 // Store ID on the original button
-                button.dataset.disabledButtonId = index;
+                button.dataset.disabledButtonId = buttonId;
+                
+                // Remember this button for future checks
+                processedButtons.set(buttonId, buttonId);
             });
             
             updateBadge();
@@ -318,26 +356,27 @@ function processSubmitButtons() {
     });
 }
 
-// Function to restore submit buttons
+// Update the restore function to also use our tracking
 function restoreSubmitButtons() {
     // Get all disabled buttons
     const disabledButtons = document.querySelectorAll('.disabled-submit-button');
     
-    // Create a map of ID to button for faster lookup
-    const originalButtons = {};
-    document.querySelectorAll('button[data-disabled-button-id], input[data-disabled-button-id]').forEach(btn => {
-        originalButtons[btn.dataset.disabledButtonId] = btn;
-    });
-    
     // Restore each disabled button
     disabledButtons.forEach(disabledButton => {
         const id = disabledButton.dataset.originalButtonId;
-        if (id && originalButtons[id]) {
+        
+        // Find any button with this ID
+        const originalButton = document.querySelector(`[data-disabled-button-id="${id}"]`);
+        
+        if (originalButton) {
             // Found the original button, restore it
-            const originalButton = originalButtons[id];
             originalButton.style.display = '';
             originalButton.removeAttribute('data-disabled-button-id');
             disabledButton.remove();
+            
+            // Remove from our tracking
+            const buttonId = generateButtonId(originalButton);
+            processedButtons.delete(buttonId);
         } else {
             // Just remove the disabled placeholder
             disabledButton.remove();
@@ -345,13 +384,18 @@ function restoreSubmitButtons() {
     });
     
     // Final pass: Find any buttons that might have been missed
-    document.querySelectorAll('button, input[type=submit]').forEach(element => {
-        if ((element.tagName === 'BUTTON' && element.textContent.includes('Submit') && element.style.display === 'none') ||
-            (element.tagName === 'INPUT' && element.type === 'submit' && element.style.display === 'none')) {
-            element.style.display = '';
-            element.removeAttribute('data-disabled-button-id');
-        }
+    document.querySelectorAll('button[data-disabled-button-id], input[data-disabled-button-id]').forEach(element => {
+        element.style.display = '';
+        
+        // Remove from our tracking
+        const buttonId = generateButtonId(element);
+        processedButtons.delete(buttonId);
+        
+        element.removeAttribute('data-disabled-button-id');
     });
+    
+    // Clear all tracking in case we missed anything
+    processedButtons.clear();
     
     updateBadge();
 }
@@ -437,5 +481,181 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     }
 });
 
+// Flag to indicate when our extension is making changes
+let isExtensionModifying = false;
+
+// Function to set up MutationObserver to detect page changes
+function setupMutationObserver() {
+    // Create a MutationObserver instance
+    const observer = new MutationObserver((mutations) => {
+        // Skip if our extension is currently modifying the DOM
+        if (isExtensionModifying) return;
+        
+        // Check if any mutations are relevant to our extension
+        const relevantMutation = mutations.some(mutation => {
+            // We care about added nodes that might be submit buttons
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                for (const node of mutation.addedNodes) {
+                    // Skip non-element nodes like text nodes
+                    if (node.nodeType !== Node.ELEMENT_NODE) continue;
+                    
+                    // Check if the added node is a submit button
+                    if ((node.tagName === 'BUTTON' || 
+                         (node.tagName === 'INPUT' && node.type === 'submit')) && 
+                        isSubmitButton(node)) {
+                        return true;
+                    }
+                    
+                    // Check if the added node contains submit buttons
+                    if (node.querySelectorAll) {
+                        const containsSubmit = node.querySelectorAll('button, input[type=submit]');
+                        if (containsSubmit.length > 0) {
+                            for (const el of containsSubmit) {
+                                if (isSubmitButton(el)) return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        });
+        
+        // If we found relevant mutations, reprocess the submit buttons
+        if (relevantMutation) {
+            chrome.storage.local.get(['extensionEnabled'], (result) => {
+                if (result.extensionEnabled !== false) {
+                    // Set flag before making modifications
+                    isExtensionModifying = true;
+                    processSubmitButtons();
+                    // Reset flag after a small delay to ensure our changes are complete
+                    setTimeout(() => {
+                        isExtensionModifying = false;
+                    }, 50);
+                }
+            });
+        }
+    });
+    
+    // Start observing the document with the configured parameters
+    observer.observe(document.body, {
+        childList: true,     // observe direct children
+        subtree: true,       // and lower descendants too
+        attributes: false,   // don't care about attribute changes
+        characterData: false // don't care about text content changes
+    });
+    
+    return observer;
+}
+
+// Add a function to observe DOM changes for new buttons and wizard navigation
+function setupButtonObserver() {
+    const observer = new MutationObserver((mutations) => {
+        let shouldProcess = false;
+        
+        // Look for relevant changes
+        for (const mutation of mutations) {
+            // Class changes that might show/hide wizard steps
+            if (mutation.type === 'attributes' && 
+                (mutation.attributeName === 'class' || mutation.attributeName === 'style')) {
+                
+                // Check if this could be a wizard step becoming active
+                if (mutation.target.classList && 
+                    (mutation.target.classList.contains('active') || 
+                     mutation.target.classList.contains('show') || 
+                     mutation.target.classList.contains('current'))) {
+                    
+                    shouldProcess = true;
+                    break;
+                }
+            }
+            
+            // New elements added
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                for (const node of mutation.addedNodes) {
+                    if (node.nodeType !== Node.ELEMENT_NODE) continue;
+                    
+                    if (isSubmitButton(node)) {
+                        shouldProcess = true;
+                        break;
+                    }
+                    
+                    // Check for submit buttons in added content
+                    if (node.querySelectorAll) {
+                        const hasButtons = node.querySelectorAll('button, input[type=submit]');
+                        if (hasButtons.length > 0) {
+                            shouldProcess = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (shouldProcess) break;
+            }
+        }
+        
+        if (shouldProcess) {
+            // Wait a moment for DOM to stabilize
+            setTimeout(() => {
+                chrome.storage.local.get(['extensionEnabled'], (result) => {
+                    if (result.extensionEnabled !== false) {
+                        processSubmitButtons();
+                    }
+                });
+            }, 50);
+        }
+    });
+    
+    // Start observing
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style', 'display']
+    });
+    
+    return observer;
+}
+
 // Process buttons when the page loads
-processSubmitButtons(); 
+processSubmitButtons();
+
+// Set flag before our extension makes changes
+isExtensionModifying = true;
+
+// Modify functions to set/reset the flag
+const originalProcessSubmitButtons = processSubmitButtons;
+processSubmitButtons = function() {
+    isExtensionModifying = true;
+    originalProcessSubmitButtons();
+    setTimeout(() => {
+        isExtensionModifying = false;
+    }, 50);
+};
+
+const originalRestoreSubmitButtons = restoreSubmitButtons;
+restoreSubmitButtons = function() {
+    isExtensionModifying = true;
+    originalRestoreSubmitButtons();
+    setTimeout(() => {
+        isExtensionModifying = false;
+    }, 50);
+};
+
+// Initialize the MutationObserver after the DOM is fully loaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMutationObserver);
+} else {
+    setupMutationObserver();
+}
+
+// Reset the flag after initial processing
+setTimeout(() => {
+    isExtensionModifying = false;
+}, 50);
+
+// Initialize observer
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupButtonObserver);
+} else {
+    setupButtonObserver();
+} 

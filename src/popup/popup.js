@@ -115,7 +115,7 @@ requestCountAndUpdate();
 
 // Settings button click handler
 document.getElementById('settingsButton').addEventListener('click', function() {
-    window.location.href = 'settings.html';
+    window.location.href = '../settings/settings.html';
 });
 
 document.getElementById('enableButton').addEventListener('click', () => {

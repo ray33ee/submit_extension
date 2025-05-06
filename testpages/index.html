@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Button Disabler - Test Pages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #2d3748;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin: 1.5rem 0 1rem;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        .test-pages {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .test-page-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .test-page-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: #4299e1;
+            color: white;
+            padding: 1rem;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-description {
+            margin-bottom: 1.5rem;
+            color: #4a5568;
+        }
+
+        .card-features {
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            color: #4a5568;
+            font-size: 0.95rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #4299e1;
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .cta-button:hover {
+            background: #3182ce;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Submit Button Disabler Test Pages</h1>
+            <p>A collection of test pages to help evaluate and showcase the Submit Button Disabler extension.</p>
+        </header>
+
+        <h2>Available Test Pages</h2>
+        <div class="test-pages">
+            <!-- Contact Form Test Page -->
+            <div class="test-page-card">
+                <div class="card-header">
+                    <h3 class="card-title">Contact Form</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">
+                        A simple, clean contact form with a submit button for basic testing.
+                    </p>
+                    <div class="card-features">
+                        <ul class="feature-list">
+                            <li>Single form with submit button</li>
+                            <li>Clean modern design</li>
+                            <li>Visual feedback on submission</li>
+                            <li>Includes visual reference rectangle</li>
+                        </ul>
+                    </div>
+                    <a href="test-page.html" class="cta-button">Open Test Page</a>
+                </div>
+            </div>
+
+            <!-- Dual Forms Test Page -->
+            <div class="test-page-card">
+                <div class="card-header">
+                    <h3 class="card-title">Dual Forms</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">
+                        Two different forms on the same page, each with its own submit button.
+                    </p>
+                    <div class="card-features">
+                        <ul class="feature-list">
+                            <li>Contact form and newsletter signup</li>
+                            <li>Different styling for each form</li>
+                            <li>Success message feedback for both forms</li>
+                            <li>Tests multi-form handling</li>
+                        </ul>
+                    </div>
+                    <a href="dual-forms.html" class="cta-button">Open Test Page</a>
+                </div>
+            </div>
+
+            <!-- Button Gallery Test Page -->
+            <div class="test-page-card">
+                <div class="card-header">
+                    <h3 class="card-title">Button Gallery</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">
+                        A comprehensive collection of different submit buttons with various styles and sizes.
+                    </p>
+                    <div class="card-features">
+                        <ul class="feature-list">
+                            <li>30+ different button styles</li>
+                            <li>All buttons have "Submit" text</li>
+                            <li>Includes increasingly larger buttons</li>
+                            <li>Different colors, shapes, and effects</li>
+                        </ul>
+                    </div>
+                    <a href="button-gallery.html" class="cta-button">Open Test Page</a>
+                </div>
+            </div>
+
+            <!-- Dynamic Wizard Test Page -->
+            <div class="test-page-card">
+                <div class="card-header">
+                    <h3 class="card-title">Dynamic Wizard</h3>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">
+                        A multi-step wizard that dynamically creates submit buttons at each step.
+                    </p>
+                    <div class="card-features">
+                        <ul class="feature-list">
+                            <li>New submit buttons generated in DOM</li>
+                            <li>Separate Next and Submit buttons</li>
+                            <li>Final step with multiple submit buttons</li>
+                            <li>Interaction logging for debugging</li>
+                        </ul>
+                    </div>
+                    <a href="dynamic-wizard.html" class="cta-button">Open Test Page</a>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>These test pages are designed for testing the Submit Button Disabler browser extension. New test pages will be added here as they are created.</p>
+        </footer>
+    </div>
+</body>
+</html> 

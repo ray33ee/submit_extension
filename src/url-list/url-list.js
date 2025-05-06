@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         actionInProgress = true;
         backButton.disabled = true;
         
-        window.location.href = 'settings.html';
+        window.location.href = '../settings/settings.html';
         // No need to reset flags as we're navigating away
     });
 

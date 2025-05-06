@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Back button functionality
     const backButton = document.getElementById('backButton');
     backButton.addEventListener('click', function() {
-        window.location.href = 'popup.html';
+        window.location.href = '../popup/popup.html';
     });
 
     // Load saved settings
@@ -51,6 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // URL List button click handler
     urlListButton.addEventListener('click', function() {
-        window.location.href = 'url-list.html';
+        window.location.href = '../url-list/url-list.html';
     });
 }); 
