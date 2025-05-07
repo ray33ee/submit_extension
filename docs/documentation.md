@@ -63,14 +63,12 @@ The Submit Button Disabler extension:
 2. Replaces these buttons with visually distinct disabled versions
 3. When a disabled button is clicked, shows a tooltip message explaining the button is disabled
 4. Provides a way to re-enable buttons when needed through the extension popup
-5. Continuously monitors the page for dynamically added submit buttons
 
 ### Technical Implementation
 
 The extension uses several technologies to achieve its functionality:
 
 - **Content Scripts**: Identify and replace submit buttons directly in the webpage
-- **MutationObserver API**: Monitors DOM changes to detect and disable dynamically created submit buttons
 - **Chrome Storage API**: Persists settings and preferences across browser sessions
 - **Message Passing**: Communicates between background scripts, content scripts, and the popup UI
 - **CSS Styling**: Creates visually distinct disabled buttons with clear visual indicators
@@ -81,7 +79,6 @@ The extension identifies submit buttons using the following criteria:
 
 - Button elements with text content containing "Submit"
 - Input elements with type="submit" and value="Submit"
-- Dynamic buttons added to the DOM after page load
 
 ## Features
 
@@ -95,7 +92,6 @@ The extension identifies submit buttons using the following criteria:
 
 ### Advanced Features
 
-- **Dynamic Button Detection**: Uses MutationObserver to detect and disable dynamically created submit buttons
 - **URL Management**: Control which websites the extension works on using allowlist/blocklist
 - **Confirmation Dialog**: Optional confirmation before re-enabling buttons
 - **Visual Status Indicators**: Clear status icons showing the current protection state
@@ -191,7 +187,6 @@ The Submit Button Disabler extension is designed with security and privacy in mi
 | Submit buttons not being disabled | Check if the extension is enabled, or if the site is in your blocklist |
 | Extension not working on a specific site | Try adding the site to your allowlist in allowlist mode, or removing it from your blocklist |
 | Submit buttons not re-enabling | Try refreshing the page or temporarily disabling the extension |
-| Dynamic buttons not being disabled | The extension should handle most dynamic buttons, but refresh the page if needed |
 | Extension conflicts with site functionality | Add the site to your blocklist and report the issue |
 
 ### Performance Impact
@@ -266,7 +261,6 @@ submit-button-disabler/
 ### Technical Overview
 
 - The extension uses **content scripts** to identify and replace submit buttons
-- **MutationObserver** monitors DOM changes to handle dynamically added buttons
 - **Background scripts** handle badge updates and communication between components
 - **Storage API** is used to persist settings across browser sessions
 - **URL matching** uses pattern matching for flexible site configuration
@@ -277,7 +271,6 @@ submit-button-disabler/
 - **Event Listeners**: Handle user interactions with disabled buttons
 - **Messaging System**: Enables communication between extension components
 - **Storage Management**: Saves and retrieves user preferences
-- **Mutation Observer**: Monitors for dynamic DOM changes
 
 ## Contributing
 

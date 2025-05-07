@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toggle Submit Button</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #toggleBtn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #toggleBtn:hover {
+            background-color: #45a049;
+        }
+
+        #submitBtn {
+            background-color: #2196F3;
+            color: white;
+            margin-top: 1rem;
+        }
+
+        #submitBtn:hover {
+            background-color: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="toggleBtn">Toggle Button</button>
+    </div>
+
+    <script>
+        const toggleBtn = document.getElementById('toggleBtn');
+        let submitBtn = null;
+
+        toggleBtn.addEventListener('click', () => {
+            if (submitBtn) {
+                // Remove the submit button
+                submitBtn.remove();
+                submitBtn = null;
+            } else {
+                // Create and add the submit button
+                submitBtn = document.createElement('button');
+                submitBtn.id = 'submitBtn';
+                submitBtn.textContent = 'Submit';
+                submitBtn.addEventListener('click', () => {
+                    alert('Form submitted!');
+                });
+                toggleBtn.parentNode.appendChild(submitBtn);
+            }
+        });
+    </script>
+</body>
+</html> 

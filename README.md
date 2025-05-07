@@ -70,6 +70,7 @@ This browser extension automatically disables submit buttons on webpages by repl
 
 ## Future Plans
 
+- Modify the code to work on dynamic websites - rewrite the entire code based on strat.txt
 - Add extension to official extension stores:
   - Microsoft Edge Add-ons
   - Safari Extensions

@@ -1,0 +1,9 @@
+ - Create a special function which is called a) when a page is loaded and b) when a page is mutated (only called on mutateed part). This function takes a node (if its a mutation) or the entire dom(if if the page is loaded)
+ - This special function should make a simple decision to do one of three things:
+  - Hide and cover all submit buttons
+  - Uncover and show submit buttons
+- This decision should be based on things like is the extension enabled and is the url in a allow/block list amd the decision should be its own function returning true or false
+
+
+- Sometimes mutations will add an element and remove it later.
+- Sometimes mutations will add elements and never remove them

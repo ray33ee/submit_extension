@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Submit Button Disabler",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "Disables submit buttons on webpages to prevent accidental submissions",
   "permissions": ["activeTab", "storage"],
   "action": {
